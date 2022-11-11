@@ -9,13 +9,16 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.android.material.textfield.TextInputLayout;
+
 public class MainActivity extends AppCompatActivity {
     private Cliente[] losClientes;
     private  int indice;
 
-    private EditText etRut, etCredito, etRazon;
+    private EditText etRut, etCredito;
+    private TextInputLayout tilRazon;
 
-    private Button btnGrabar, btnSiguiente;
+    private Button btnGrabar, btnSiguiente, btnAtras;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,45 +27,142 @@ public class MainActivity extends AppCompatActivity {
 
         indice = 0;
         losClientes = new Cliente[10];
-        losClientes[0] = new Cliente("1-9", "Juan", 30000);
-        losClientes[1] = new Cliente("2-7", "Maria", 40000);
 
-        //Referencias
+        referencias();
+        eventos();
+    }
+
+    public void grabarCliente(){
+        String rut, credito, rz;
+
+        rut = etRut.getText().toString();
+        credito = etCredito.getText().toString();
+        rz = tilRazon.getEditText().getText().toString();
+
+        if(validarDatos(rut, credito, rz)){
+            int creditoInt = Integer.parseInt(credito);
+            Cliente cli = new Cliente(rut, rz, creditoInt);
+
+            for(int x = 0; x < losClientes.length; ++x){
+                if(losClientes[x] == null){
+                    losClientes[x] = cli;
+                    indice = x;
+                    break;
+                }
+            }
+
+            etRut.setText(""); etCredito.setText("");
+            tilRazon.getEditText().setText("");
+            etRut.requestFocus();
+            Toast.makeText(this, "Cliente grabado exitosamente", Toast.LENGTH_SHORT).show();
+        }else{
+            Toast.makeText(this, "Tiene errores en el formulario", Toast.LENGTH_SHORT).show();
+        }
+
+    }
+    
+    private boolean validarDatos(String rut, String credito, String rz){
+        boolean vOK = true;
+        tilRazon.setError(null);
+
+        if(rut.isEmpty()){
+            vOK = false;
+            etRut.setError("Debe ingresar rut");
+        }
+
+        if(credito.isEmpty()){
+            vOK = false;
+            etCredito.setError("Debe ingresar credito");
+        }else{
+            int creditoInt = Integer.parseInt(credito);
+            if(creditoInt < 1 || creditoInt > 100000){
+                etCredito.setError("No debe superar los cien mil pesos");
+                vOK = false;
+            }
+        }
+
+        if(rz.isEmpty()){
+            vOK = false;
+            tilRazon.setError("Debe ingresar razón social");
+        }
+
+
+        return vOK;
+    }
+
+    private void mostrarCliente(){
+        Cliente cliente = losClientes[indice];
+
+        if(cliente != null) {
+            etRut.setText(cliente.getRut());
+            etCredito.setText(String.valueOf(cliente.getCredito()));
+            tilRazon.getEditText().setText(cliente.getRazon());
+
+            Log.d("TAG_", "Rut " + cliente.getRut());
+            Log.d("TAG_", "Razon " + cliente.getRazon());
+            Log.d("TAG_", "Credito " + cliente.getCredito());
+        }else{
+            Toast.makeText(MainActivity.this, "No hay más clientes para mostrar", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void avanzar(){
+        indice++;
+        if(indice < losClientes.length) {
+            mostrarCliente();
+            btnAtras.setEnabled(true);
+        }else{
+            Toast.makeText(this, "Es el último de la lista no puede avanzar", Toast.LENGTH_SHORT).show();
+            indice = losClientes.length - 1;
+        }
+    }
+
+    private void retroceder(){
+        indice--;
+        if(indice >= 0) {
+            mostrarCliente();
+            if(indice == 0)
+                btnAtras.setEnabled(false);
+        }else{
+            indice = 0;
+        }
+    }
+
+    //region Referencias y Eventos
+
+    private void referencias(){
         etRut = findViewById(R.id.etRut);
         etCredito = findViewById(R.id.etCredito);
-        etRazon = findViewById(R.id.etRazon);
+        tilRazon = findViewById(R.id.tilRazon);
         btnGrabar = findViewById(R.id.btnGrabar);
+        btnAtras = findViewById(R.id.btnAtras);
         btnSiguiente = findViewById(R.id.btnSiguiente);
+    }
 
-        //Eventos
+    private void eventos() {
         btnGrabar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(MainActivity.this, "Click boton", Toast.LENGTH_LONG).show();
+                grabarCliente();
             }
         });
 
         btnSiguiente.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Cliente cliente = losClientes[indice];
-
-                if(cliente != null) {
-                    etRut.setText(cliente.getRut());
-                    etCredito.setText(String.valueOf(cliente.getCredito()));
-                    etRazon.setText(cliente.getRazon());
-
-                    indice++;
-                    Log.d("TAG_", "Rut " + cliente.getRut());
-                    Log.d("TAG_", "Razon " + cliente.getRazon());
-                    Log.d("TAG_", "Credito " + cliente.getCredito());
-                }else{
-                    Toast.makeText(MainActivity.this, "No hay más clientes para mostrar", Toast.LENGTH_LONG).show();
-                }
-
+                avanzar();
             }
         });
 
-
+        btnAtras.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                retroceder();
+            }
+        });
     }
+
+    //endregion
+
+
 }
