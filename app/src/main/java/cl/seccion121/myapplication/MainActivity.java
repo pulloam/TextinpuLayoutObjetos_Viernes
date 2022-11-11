@@ -11,8 +11,10 @@ import android.widget.Toast;
 
 import com.google.android.material.textfield.TextInputLayout;
 
+import java.util.ArrayList;
+
 public class MainActivity extends AppCompatActivity {
-    private Cliente[] losClientes;
+    private ArrayList<Cliente> losClientes;
     private  int indice;
 
     private EditText etRut, etCredito;
@@ -26,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         indice = 0;
-        losClientes = new Cliente[10];
+        losClientes = new ArrayList<>();
 
         referencias();
         eventos();
@@ -43,13 +45,8 @@ public class MainActivity extends AppCompatActivity {
             int creditoInt = Integer.parseInt(credito);
             Cliente cli = new Cliente(rut, rz, creditoInt);
 
-            for(int x = 0; x < losClientes.length; ++x){
-                if(losClientes[x] == null){
-                    losClientes[x] = cli;
-                    indice = x;
-                    break;
-                }
-            }
+            losClientes.add(cli);
+            indice = losClientes.size();
 
             etRut.setText(""); etCredito.setText("");
             tilRazon.getEditText().setText("");
@@ -91,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void mostrarCliente(){
-        Cliente cliente = losClientes[indice];
+        Cliente cliente = losClientes.get(indice);
 
         if(cliente != null) {
             etRut.setText(cliente.getRut());
@@ -108,12 +105,12 @@ public class MainActivity extends AppCompatActivity {
 
     private void avanzar(){
         indice++;
-        if(indice < losClientes.length) {
+        if(indice < losClientes.size()) {
             mostrarCliente();
             btnAtras.setEnabled(true);
         }else{
             Toast.makeText(this, "Es el último de la lista no puede avanzar", Toast.LENGTH_SHORT).show();
-            indice = losClientes.length - 1;
+            indice = losClientes.size() - 1;
         }
     }
 
