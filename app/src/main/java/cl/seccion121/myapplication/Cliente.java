@@ -1,11 +1,28 @@
 package cl.seccion121.myapplication;
 
-public class Cliente {
+import java.io.Serializable;
+
+public class Cliente implements Serializable {
     private String rut;
     private String razon;
     private int credito;
+    private Sucursal sucursal;
 
     public Cliente(){}
+
+    public String toString(){
+        return rut + " -> " + razon;
+    }
+
+
+
+    public Sucursal getSucursal() {
+        return sucursal;
+    }
+
+    public void setSucursal(Sucursal sucursal) {
+        this.sucursal = sucursal;
+    }
 
     public Cliente(String rut, String razon, int credito) {
         this.rut = rut;

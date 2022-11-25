@@ -2,6 +2,7 @@ package cl.seccion121.myapplication;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -20,7 +21,7 @@ public class MainActivity extends AppCompatActivity {
     private EditText etRut, etCredito;
     private TextInputLayout tilRazon;
 
-    private Button btnGrabar, btnSiguiente, btnAtras;
+    private Button btnGrabar, btnSiguiente, btnAtras, btnEnviar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +35,16 @@ public class MainActivity extends AppCompatActivity {
         eventos();
     }
 
+    private void enviarCliente(){
+        if(losClientes.size() > 0) {
+            Intent i = new Intent(this, ListadoClientesActivity.class);
+            i.putExtra("el_cliente", losClientes.get(indice));
+            startActivity(i);
+        }else{
+            Toast.makeText(this, "No hay clientes en el listado", Toast.LENGTH_SHORT).show();
+        }
+    }
+
     public void grabarCliente(){
         String rut, credito, rz;
 
@@ -44,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
         if(validarDatos(rut, credito, rz)){
             int creditoInt = Integer.parseInt(credito);
             Cliente cli = new Cliente(rut, rz, creditoInt);
+            cli.setSucursal(new Sucursal(123, "nombreSuc", "Direccion", "Encargado"));
 
             losClientes.add(cli);
             indice = losClientes.size();
@@ -132,6 +144,7 @@ public class MainActivity extends AppCompatActivity {
         etCredito = findViewById(R.id.etCredito);
         tilRazon = findViewById(R.id.tilRazon);
         btnGrabar = findViewById(R.id.btnGrabar);
+        btnEnviar = findViewById(R.id.btnEnviarDatos);
         btnAtras = findViewById(R.id.btnAtras);
         btnSiguiente = findViewById(R.id.btnSiguiente);
     }
@@ -141,6 +154,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 grabarCliente();
+            }
+        });
+
+        btnEnviar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                enviarCliente();
             }
         });
 
